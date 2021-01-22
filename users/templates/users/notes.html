@@ -1,0 +1,54 @@
+{% extends "notechainapp/layout.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+   <div class="content-section">
+      <div class="media">
+         <img class="rounded-circle account-img" src={{ user.profile.image.url }}>
+         <div class="media-body">
+            <h2 class="account-heading">{{ user.username }}</h2>
+            <p class="text-secondary">{{ user.email }}</p>
+         </div>
+      </div>
+
+       {% for note in notes %}
+            <article class="media content-section my-5">
+                {% if note.is_protected %}
+                    <img class="article-image mr-2" src="{{STATIC_URL}}/media/lock.png">
+                {% else %}
+                    <img class="article-image mr-2" src="{{STATIC_URL}}/media/unlock.png">
+                {% endif %}
+                <div class="media-body">
+                    <div class="article-metadata">
+                        <h5 class="mr-2">{{ note.owner }}</h5>
+                    </div>
+                    <h2>
+                        {% if not note.is_protected %}
+                            <a class="article-title">{{ note.title }}</a>
+                            <a class="btn btn-outline-success" href="/users/protect/{{note.id}}">Korumaya Al</a>
+                        {% else %}
+                            <a class="article-title">Korumalı İçerik</a>
+                        {% endif %}
+                    </h2>
+                    {% if not note.is_protected %}
+                        <p class="card-text"><b>İçerik: </b>{{note.description}}</p>
+                    {% else %}
+                        <p class="card-text"><b>Hash Kodu: </b>{{note.hash_code}}</p>
+                    {% endif %}
+                </div>
+            </article>
+        {% endfor %}
+
+       <form method="post" enctype="multipart/form-data" >
+           {% csrf_token %}
+           <fieldset class="form-group">
+              <legend class="border-bottom mb-4">Yeni Not Oluştur</legend>
+              {{ form|crispy }}
+           </fieldset>
+           <div class="form-group">
+               <button class="btn btn-outline-info" type="submit">Kaydet</button>
+           </div>
+       </form>
+
+
+   </div>
+{% endblock content %}
